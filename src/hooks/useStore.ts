@@ -124,20 +124,32 @@ export const useStore = () => {
     };
 
     const saveConfig = async (data: any) => {
-        await fetch("/api/config", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-        const configData = {
-            ...data,
-            tax_rate: parseFloat(data.tax_rate as string) || 0,
-            gateway_fee: parseFloat(data.gateway_fee as string) || 0,
-            fixed_fee: parseFloat(data.fixed_fee as string) || 0,
-        } as StoreConfig;
-        setConfig(configData);
-        setView("dashboard");
-        // Don't fetch from WC here, user must sync manually or initial sync occurs
+        try {
+            const res = await fetch("/api/config", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || "Erro ao salvar na nuvem Supabase.");
+            }
+
+            const configData = {
+                ...data,
+                tax_rate: parseFloat(data.tax_rate as string) || 0,
+                gateway_fee: parseFloat(data.gateway_fee as string) || 0,
+                fixed_fee: parseFloat(data.fixed_fee as string) || 0,
+            } as StoreConfig;
+
+            setConfig(configData);
+            setView("dashboard");
+            // Don't fetch from WC here, user must sync manually or initial sync occurs
+        } catch (error: any) {
+            console.error("Save config error:", error);
+            alert(`Falha ao salvar as configurações: ${error.message}`);
+        }
     };
 
     const syncData = async (force: boolean = false) => {

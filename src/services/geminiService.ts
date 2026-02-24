@@ -1,7 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-
 export interface ProductHealth {
   status: "healthy" | "warning" | "critical";
   reason: string;
@@ -15,6 +13,17 @@ export async function analyzeProductHealth(
   margin: number,
   markup: number
 ): Promise<ProductHealth> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return {
+      status: "warning",
+      reason: "API Key do Gemini ausente.",
+      recommendation: "Adicione GEMINI_API_KEY no arquivo .env ou Vercel para ativar a IA.",
+    };
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `Analise a saúde financeira deste produto de e-commerce:

@@ -34,8 +34,13 @@ app.get("/api/config", async (req, res) => {
 });
 
 app.post("/api/config", async (req, res) => {
-    await saveStoreConfig(req.body);
-    res.json({ success: true });
+    try {
+        await saveStoreConfig(req.body);
+        res.json({ success: true });
+    } catch (error: any) {
+        console.error("Config Save API Error:", error.message);
+        res.status(500).json({ error: error.message || "Failed to save configuration" });
+    }
 });
 
 app.get("/api/sync/progress", (req, res) => {

@@ -41,7 +41,10 @@ export async function saveStoreConfig(storeConfig: any) {
       fixed_fee: storeConfig.fixed_fee || 0
     });
 
-  if (error) console.error("Error saving config:", error);
+  if (error) {
+    console.error("Error saving config:", error);
+    throw new Error(error.message);
+  }
 }
 
 export async function getProductCosts() {
