@@ -14,6 +14,7 @@ import {
     getLastOrderSyncDate
 } from "./db";
 import { WooCommerceService } from "./services/woocommerce";
+import { analyzeProductHealth } from "../src/services/geminiService";
 import * as XLSX from "xlsx";
 import multer from "multer";
 
@@ -164,7 +165,6 @@ app.post("/api/products/:id/cost", async (req, res) => {
 app.post("/api/products/:id/analyze", async (req, res) => {
     const { productName, price, cost, margin, markup } = req.body;
     try {
-        const { analyzeProductHealth } = await import("../src/services/geminiService.ts");
         const analysis = await analyzeProductHealth(productName, price, cost, margin, markup);
         res.json(analysis);
     } catch (error) {
